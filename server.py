@@ -12,9 +12,6 @@ CORS(app)
 DATABASE = 'blitz.db'
 DAILY_CHIPS = 20
 
-# =========================
-# DB INIT (CRÍTICO)
-# =========================
 def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -44,14 +41,8 @@ def init_db():
     conn.close()
 
 
-# 🚀 ISSO AQUI É O PULO DO GATO
-# Gunicorn importa o arquivo → DB nasce
 init_db()
 
-
-# =========================
-# ROUTES
-# =========================
 @app.route('/api/player/<username>', methods=['GET'])
 def get_player(username):
     conn = sqlite3.connect(DATABASE)
@@ -88,7 +79,6 @@ def get_player(username):
             'hours_left': hours_left
         })
 
-    # jogador novo
     c.execute(
         'INSERT INTO players (username, chips, last_claim) VALUES (?, ?, ?)',
         (username, DAILY_CHIPS, now.isoformat())
@@ -245,9 +235,6 @@ def index():
     })
 
 
-# =========================
-# BACKGROUND CLEANUP
-# =========================
 def auto_cleanup():
     while True:
         time.sleep(86400)
@@ -271,10 +258,6 @@ cleanup_thread = threading.Thread(
 )
 cleanup_thread.start()
 
-
-# =========================
-# LOCAL DEV ONLY
-# =========================
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
